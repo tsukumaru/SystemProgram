@@ -112,4 +112,6 @@ int main(){
 //	print_data(sample, SAMPLE_COUNT);
 	printf("比較回数：%d\n", cmp);
 	printf("交換回数：%d\n", swp);
+
+	return 0;
 }
