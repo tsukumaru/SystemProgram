@@ -52,7 +52,8 @@ int mygetchar(int sec)
 	int c = -3;
 	struct sigaction sa_alarm;
 	struct itimerval itimer;
-	
+	time_t timer;
+
 	alrm_count = sec;
 
 	memset(&sa_alarm, 0, sizeof(sa_alarm));
@@ -71,7 +72,9 @@ int mygetchar(int sec)
 		perror("setitimer");
 		exit(1);
 	}
-//	printf("%d", alrm_count);
+	
+	time(&timer);
+	printf("current time is %s\n", ctime(&timer));
 	c = getchar();
 
 	itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
