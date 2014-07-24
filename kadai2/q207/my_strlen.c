@@ -16,21 +16,21 @@ int file_open_check(FILE *fp){
 void set_string(char *s, FILE *fp){
 	int c, i;
 	char a[] = "aiueo";
+	char *t;
 	
-//	t = s; //sの先頭アドレスを確保
+	t = s; //sの先頭アドレスを確保
 	while((c = fgetc(fp)) != EOF){
 		*s = (char)c;
 //		printf("%c", *s);	
 		s++;
 	}
 	
-	for(i=0; i < 10000; i++){
+/*	for(i=0; i < 10000; i++){
 		s += strlcat(s, a, 5);
-	}
+	}*/
 //	printf("%s\n", s);
 //	s = t; //sに先頭アドレスを渡す
 //	printf("%s", s);
-//	return s;
 }
 
 int my_strlen2(char *s){
@@ -62,21 +62,21 @@ double strlen_time(char *s, int key){
 			start = clock();
 			for(i = 0; i < 300; i++)
 				len = strlen(s);
-//			printf("words length = %d\n", len);
+			printf("strlen: length  = %d\n", len);
 			end = clock();
 			break;
 		case 1:
 			start = clock();
 			for(i = 0; i < 300; i++)
 				len = my_strlen1(s);
-//			printf("words length = %d\n", len);
+			printf("my_strlen1: length = %d\n", len);
 			end = clock();
 			break;
 		case 2:
 			start = clock();
 			for(i = 0; i < 300; i++)
 				len = my_strlen2(s);
-//			printf("words length = %d\n", len);
+			printf("my_strlen2: length = %d\n", len);
 			end = clock();
 			break;
 		default: return -1;
