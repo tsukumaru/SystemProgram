@@ -7,10 +7,12 @@
 char * getString(char *c, int num, int size){
 	int count;
 	
-	c += size;
+//	c += size;
 	//num個の改行コードを見つけるまでループをまわす
-	count = 0;
-	while(count <= num){
+	for (count = 0; count <= num;){
+//		printf("%d\n", c);
+		if (c == 0) break;
+
 		if(*c == '\n'){
 			count++;
 		}
@@ -31,13 +33,15 @@ char * my_tail(int fd, int num){
 		exit(-1);
 	}
 	
-	size = fs.st_size;
-	c = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+	c = mmap(NULL, fs.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if(c == MAP_FAILED){
 		perror("mmap");
 		exit(-1);
 	}
-		
+	c += fs.st_size;
+			
+	size = fs.st_size / sizeof(struct stat);
+	
 	return getString(c, num, size);
 }
 
@@ -50,16 +54,22 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	
-	fd = open(argv[2], O_RDONLY);
+	fd = open(argv[1], O_RDONLY);
 	if(fd < 0){
 		perror(argv[1]);
 		exit(-1);
 	}
 
-	line_num = strtol(argv[1], &e, 10);
+	line_num = strtol(argv[2], &e, 10);
 	if(*e != '\0'){
 		printf("error at \'*e\'\n");
 	}
+
+	if (line_num < 0) {
+		printf("Error: Please input POSITIVE num\n");
+		exit(-1);
+	}
+
 //	printf("%d\n", line_num);
 	s = my_tail(fd, line_num);
 	printf("%s\n", s);
