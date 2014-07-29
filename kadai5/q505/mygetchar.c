@@ -23,28 +23,9 @@ void print_resut(int res)
 		printf("input is \'%c\'\n", res);
 }
 
-int get_resut(int c)
-{
-	if (c == EOF)
-		return -1;
-	else if (c == TIMEOUT)
-		return -2;
-	else if (c >= 0)
-		return c;
-	else 
-		return -3;
-}
-
 void alrm()
 {
-//	if (alrm_count > 0) 
-		alrm_count--;
-//	printf("alrm_count is %d\n", alrm_count);
-	 if (alrm_count == 0) {
-		timeOutFlag = 1;
-		print_resut(TIMEOUT);
-		exit(1);
-	}
+	alrm_count--;
 }
 
 int mygetchar(int sec)
@@ -58,11 +39,11 @@ int mygetchar(int sec)
 
 	memset(&sa_alarm, 0, sizeof(sa_alarm));
 	sa_alarm.sa_handler = alrm;
-	sa_alarm.sa_flags = SA_RESTART;
-
+	sa_alarm.sa_flags = SA_SIGINFO;
+	
 	if (sigaction(SIGALRM, &sa_alarm, NULL) < 0) {
 		perror("sigaction");
-		exit(1);
+		return -3;
 	}
 
 	itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 1;
@@ -70,22 +51,27 @@ int mygetchar(int sec)
 
 	if (setitimer(ITIMER_REAL, &itimer, NULL) < 0) {
 		perror("setitimer");
-		exit(1);
+		return -3;
 	}
 	
-	time(&timer);
-	printf("current time is %s\n", ctime(&timer));
-	c = getchar();
+	while(alrm_count){
+		time(&timer);
+		printf("current time is %s", ctime(&timer));
 
+		c = getchar();
+		if(feof(stdin)) return -1;
+		if (c > 0) return c;
+	}
+	
 	itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
 	itimer.it_value.tv_usec = itimer.it_interval.tv_usec = 0;
 
 	if (setitimer(ITIMER_REAL, &itimer, NULL) < 0) {
 		perror("setitimer");
-		exit(1);
+		return -3;
 	}
-	
-	return get_resut(c);
+
+	return -2;
 }
 
 int main(int argc, char *argv[])
@@ -93,6 +79,11 @@ int main(int argc, char *argv[])
 	int c, sec;
 	char *e;
 	
+	if(argc != 2){
+		printf("Usage: %s countno\n", argv[0]);
+		exit(-1);
+	}
+
 	sec = strtol(argv[1], &e, 10);
 	if (*e != '\0') {
 		perror("strtol");
